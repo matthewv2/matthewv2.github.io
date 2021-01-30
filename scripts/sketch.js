@@ -1,12 +1,6 @@
-let textArea;
-let diagrams = [];
-let fontSize = 25;
-let textHeight;
-let d = 60;
-let dx, dy = d + 10, dl;
-let CANVAS;
-let Consolas = [];
-let state = 1;
+let fontSize = 25, bold = 0, state = 1, d = 60, dy = d + 10;
+let textHeight, dx, dl, CANVAS, textArea;
+let diagrams = [], Consolas = [];
 
 function preload()
 {
@@ -16,58 +10,44 @@ function preload()
 
 function setup()
 {
+	console.log("TESTING 1 2 3");
 	select('#fontsize').changed(Update_Font_Size);
 	select('#diameter').changed(Update_Diameter);
-	select('#normal').changed(Update_Font);
-	select('#bold').changed(Update_Font);
+	select('#normal').changed(Update_Font_Bold);
+	select('#bold').changed(Update_Font_Bold);
 	select('#reset').mouseClicked(Reset_Settings);
-	
-	let importFile = createFileInput(Update_Text_Area);
-	importFile.style('display','none');
-	importFile.attribute('accept','.txt');
-	importFile.id('importButton');
-	
-	select('#export').mouseClicked(Export_File);
 	
 	textArea = select('#textArea');
 	textArea.drop(Update_Text_Area, Drag_Leave);
     textArea.dragOver(Drag_Over);
     textArea.dragLeave(Drag_Leave);
 	
-	select('#generate').mouseClicked(Generate);
-	
-	select('#download').mouseClicked(Download);
-	
 	CANVAS = createCanvas(1,1).parent('canvasPreview');
 	CANVAS.style('margin:5px');
 	background(0,0);
 	
-	Update_Font();
+	let importFile = createFileInput(Update_Text_Area);
+	importFile.style('display','none');
+	importFile.attribute('accept','.txt');
+	importFile.id('importButton');
+	select('#export').mouseClicked(Export_File);
+	select('#generate').mouseClicked(Generate);
+	select('#download').mouseClicked(Download);
+	
 	textSize(fontSize);
-	
+	Update_Text_Height();
 	noLoop();
-	
 }
 
 function draw()
 {
-	noFill();
 	let y = 2;
 	for(let i = 0; i < diagrams.length; i++)
 	{
-		image(diagrams[i], 2, y);
 		rect(1,y - 1, diagrams[i].width, diagrams[i].height);
+		image(diagrams[i], 2, y);
 		y += 20 + diagrams[i].height;
 	}
-	fill(255);
-}
-
-function Update_Font_Size()
-{
-	fontSize = int(select('#fontsize').value());
-	console.log(fontSize);
-	textSize(fontSize);
-	Update_Font();
 }
 
 function Update_Diameter()
@@ -76,28 +56,32 @@ function Update_Diameter()
 	dy = d + 10;
 }
 
-function Update_Font()
+function Update_Font_Size()
 {
-	if(document.getElementById('normal').checked)
-	{
-		textFont(Consolas[0]);
-		textHeight = Consolas[0].textBounds('I', 0, 0).h;
-	}
-	else
-	{
-		textFont(Consolas[1]);
-		textHeight =  Consolas[1].textBounds('I', 0, 0).h;
-	}
+	fontSize = int(select('#fontsize').value());
+	textSize(fontSize);
+	Update_Text_Height();
+}
+
+function Update_Font_Bold()
+{
+	bold = int(document.getElementById('bold').checked);
+	Update_Text_Height();
+}
+
+function Update_Text_Height()
+{
+	textHeight = Consolas[bold].textBounds('I', 0, 0).h;
 }
 
 function Reset_Settings()
 {
 	document.getElementById('fontsize').value = 25;
-	fontSize = 25;
+	Update_Font_Size();
 	document.getElementById('diameter').value = 60;
-	d = 60;
+	Update_Diameter();
 	document.getElementById('normal').checked = true;
-	Update_Font();
+	Update_Font_Bold();
 }
 
 function Update_Text_Area(file)
@@ -130,20 +114,15 @@ function Export_File()
 
 function Generate_Diagram(data, dwidth)
 {
-	let f = data.length-1;
-	
+	let f = data.length - 1;
 	append(diagrams, createGraphics(int(dwidth + 1), int(data[f][1] + 1)));
-	
 	let di = diagrams.length - 1;
-	
 	diagrams[di].background(0,0);   
-	diagrams[di].textFont(Consolas[int(!document.getElementById('normal').checked)]);
+	diagrams[di].textFont(Consolas[bold]);
 	diagrams[di].textSize(fontSize);
 	diagrams[di].strokeWeight(2);
 	diagrams[di].pixelDensity(1);
-	
-	
-	let sx = d/2 + 2, sy = d/2 + 1 + 6, offY = 0, x = 0, y = 0;
+	let sx = d / 2 + 2, sy = d / 2 + 1 + 6, offY = 0, x = 0, y = 0;
 	
 	for(let i = 0; i < data.length - 1; i++)
 	{
@@ -157,9 +136,7 @@ function Generate_Diagram(data, dwidth)
 				break;
 			}
 		}
-		
 		y = sy + dy * i + offY;
-		
 		if(i == 0)
 		{
 			diagrams[di].textAlign(CENTER, CENTER);
@@ -169,8 +146,6 @@ function Generate_Diagram(data, dwidth)
 			else
 				diagrams[di].text(0, sx, y);
 		}
-		
-		
 		let L = true;
 		for(let j = 0; j < data[i].length; j++)
 		{
@@ -181,7 +156,6 @@ function Generate_Diagram(data, dwidth)
 			if(i != 0 && L)
 			{
 				diagrams[di].line(x - d / 2 - dx, y, x - d - dx, y);
-				
 				for(I = i - 1; I >= 0 && j <= data[I].length; I--)
 				{
 					if(data[I][j] == "")
@@ -203,10 +177,8 @@ function Generate_Diagram(data, dwidth)
 					}
 					
 				}
-				
 				L = false;
 			}
-			
 			if(match(data[i][j], "<LOOP/>"))
 			{
 				let loopdata = data[i][j].split("<LOOP/>");
@@ -218,7 +190,6 @@ function Generate_Diagram(data, dwidth)
 				diagrams[di].text(loopdata[1], x, y - d / 2 - 8);
 				diagrams[di].textAlign(CENTER, CENTER);
 			}
-			
 			diagrams[di].line(x - d / 2, y, x - d / 2 - dx, y);
 			diagrams[di].line(x - d / 2, y, x - d/2 - 5, y - 5);
 			diagrams[di].line(x - d / 2, y, x - d/2 - 5, y + 5);
@@ -235,7 +206,7 @@ function Generate_Diagram(data, dwidth)
 				diagrams[di].textSize(30);              
 				diagrams[di].textFont('Consolas');   
 				diagrams[di].text("∗", x + d/2 - 2, y - d/2 + 2);
-				diagrams[di].textFont(Consolas[int(!document.getElementById('normal').checked)]);   
+				diagrams[di].textFont(Consolas[bold]);   
 				diagrams[di].textSize(fontSize);           
 			}
 			diagrams[di].text(state, x, y);
@@ -259,11 +230,8 @@ function Generate()
 	let i = 0, j = -1;
 	let loops = 0;
 	
-	
-
 	dl = 22 + textHeight;
 	
-	//Determine longest keyword / Store Data / Format Data
 	for(let c = 0; c <= text.length; c++)
 	{
 		if(c == text.length || text[c] == ' ' || text[c] == '\t' || text[c] == '\n')
@@ -272,7 +240,6 @@ function Generate()
 			{
 				if(temp == "<NEXT/>" || temp == "<CONT/>")
 				{
-					// [START STATE, NEXT STATE, HEIGHT]
 					append(data[i],[cont, 10 + (data[i].length * d) + (10 * (data[i].length - 1)) + (dl * loops)]);
 					append(data, []);
 					cont = (temp == "<CONT/>");
@@ -337,28 +304,18 @@ function Generate()
 		else
 			temp += text[c];
 	}
-	
-	dx = 18 + Consolas[int(!document.getElementById('normal').checked)].textBounds(lString, 0, 0).w;
-
+	dx = 18 + Consolas[bold].textBounds(lString, 0, 0).w;
+	state = 1;
+	let ch = 4, lDiagram = 0;
 	for(let i = 0 ; i < data.length; i++)
 	{
 		let lArray = 0;
-		
 		for(let j = 1; j < data[i].length - 1; j++)
 			if(data[i][j].length > data[i][lArray].length)
 				lArray = j;
-				
 		Generate_Diagram(data[i], 10 + ((data[i][lArray].length + 1) * d) + (dx * data[i][lArray].length));
-	}
-	
-	let ch = 4;
-	let lDiagram = 0;
-	state = 1;
-	for(let i = 0; i < diagrams.length; i++)
-	{
 		if(diagrams[i].width > diagrams[lDiagram].width)
 			lDiagram = i;
-			
 		ch += diagrams[i].height;
 	}
 	resizeCanvas(4 + diagrams[lDiagram].width, ch + 20 * (diagrams.length - 1));
@@ -371,7 +328,7 @@ function Download()
 		let zip = new JSZip();
 		for(let i = 0; i < diagrams.length; i++)
 		{
-			let data_URL = diagrams[i].canvas.toDataURL()
+			let data_URL = diagrams[i].canvas.toDataURL();
 			zip.file('TD ' + str(i+1) +'.png', data_URL.substring(22,data_URL.length), {base64: true});
 		}
 		zip.generateAsync({type:"blob"}).then(function(content) {saveAs(content, "[KAAVIO] Transition Diagrams.zip");});
