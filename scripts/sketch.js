@@ -139,9 +139,11 @@ function Generate_Diagram(data, dwidth)
 	diagrams[di].background(0,0);   
 	diagrams[di].textFont(Consolas[int(!document.getElementById('normal').checked)]);
 	diagrams[di].textSize(fontSize);
+	diagrams[di].strokeWeight(2);
+	diagrams[di].pixelDensity(1);
 	
 	
-	let sx = d/2 + 1, sy = d/2 + 1 + 6, offY = 0, x = 0, y = 0;
+	let sx = d/2 + 2, sy = d/2 + 1 + 6, offY = 0, x = 0, y = 0;
 	
 	for(let i = 0; i < data.length - 1; i++)
 	{
@@ -229,10 +231,10 @@ function Generate_Diagram(data, dwidth)
 			
 			if(j == data[i].length - 1)
 			{
-				diagrams[di].circle(x, y, d - 5); 
+				diagrams[di].circle(x, y, d - 8); 
 				diagrams[di].textSize(30);              
 				diagrams[di].textFont('Consolas');   
-				diagrams[di].text("∗", x + d/2, y - d / 2);
+				diagrams[di].text("∗", x + d/2 - 2, y - d/2 + 2);
 				diagrams[di].textFont(Consolas[int(!document.getElementById('normal').checked)]);   
 				diagrams[di].textSize(fontSize);           
 			}
@@ -375,4 +377,3 @@ function Download()
 		zip.generateAsync({type:"blob"}).then(function(content) {saveAs(content, "[KAAVIO] Transition Diagrams.zip");});
 	}
 }
-
