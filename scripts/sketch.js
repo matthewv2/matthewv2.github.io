@@ -10,7 +10,6 @@ function preload()
 
 function setup()
 {
-	console.log("TESTING 1 2 3");
 	select('#fontsize').changed(Update_Font_Size);
 	select('#diameter').changed(Update_Diameter);
 	select('#normal').changed(Update_Font_Bold);
