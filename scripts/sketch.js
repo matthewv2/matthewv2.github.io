@@ -17,15 +17,15 @@ function setup()
 	select('#reset').mouseClicked(Reset_Settings);
 	
 	textArea = select('#textArea');
-	textArea.drop(Update_Text_Area, Drag_Leave);
-    	textArea.dragOver(Drag_Over);
-    	textArea.dragLeave(Drag_Leave);
+	textArea.drop(Import_File, Drag_Leave);
+    textArea.dragOver(Drag_Over);
+    textArea.dragLeave(Drag_Leave);
 	
 	CANVAS = createCanvas(1,1).parent('canvasPreview');
 	CANVAS.style('margin:5px');
 	background(0,0);
 	
-	let importFile = createFileInput(Update_Text_Area);
+	let importFile = createFileInput(Import_File);
 	importFile.style('display','none');
 	importFile.attribute('accept','.txt');
 	importFile.id('importButton');
@@ -83,7 +83,7 @@ function Reset_Settings()
 	Update_Font_Bold();
 }
 
-function Update_Text_Area(file)
+function Import_File(file)
 {
   if(file.type != 'text')
     return;
@@ -108,7 +108,7 @@ function Export_File()
 		return;
 	
 	let blob = new Blob([textArea.value()], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "[KAAVIO] Transition Diagram Data.txt");
+	saveAs(blob, "[KAAVIO] TD Data.txt");
 }
 
 function Generate_Diagram(data, dwidth)
@@ -186,7 +186,7 @@ function Generate_Diagram(data, dwidth)
 				diagrams[di].line(x, y - d / 2, x - 5,y - d / 2 - 5);
 				diagrams[di].line(x, y - d / 2, x + 5,y - d / 2 - 5);
 				diagrams[di].textAlign(CENTER, BOTTOM);
-				diagrams[di].text(loopdata[1], x, y - d / 2 - 8);
+				diagrams[di].text(loopdata[1], x, y - d / 2 - 10);
 				diagrams[di].textAlign(CENTER, CENTER);
 			}
 			diagrams[di].line(x - d / 2, y, x - d / 2 - dx, y);
