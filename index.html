@@ -14,8 +14,24 @@
 <body>
 <div class = "container">
 	<div class="navbar">
+		<a href = "#openModalHelp"><p id = "help"> ? </p></a>
 		<img src = "img/kaavioLogo.png" id = "kaaviologo"/>
 		<a href = "#openModal"><img src = "img/setting_icon.png" id = "setting"/></a>
+		<div id="openModalHelp" class="modalDialogHelp">
+            <div>
+                <div id = "closeHelp"> <a href="#close" title="Close" class="closeHelp">X</a> </div>
+                <h2><b>HELP</b></h2>
+                <p>To create a diagram, here's a simple example of input and expected output:</p>
+                <img src = "img/SAMPLE1.png"><br>
+                <p>In case the TD Diagram is to large to fit in the document, the user can use the keyword <span style="font-weight: bold;">&ltNEXT/&gt</span> to create another diagram.</p>
+                <img src = "img/SAMPLE2.png">
+                <p>In case the TD ladder is too long for the image to fit in the document, the user can use the keyword <span style="font-weight: bold;">&ltCONT/&gt</span> to create a continuation of the diagram.  </p>
+                <img src = "img/SAMPLE3.png">
+                <img src = "img/SAMPLE3_1.png">
+                <p>If you want to include a loop in the transition diagram. Simply insert the keyword <span style="font-weight: bold;">&ltLOOP/&gt</span> between the first input and the input that is supposed to loop. Check the sample input and expected output below:</p>
+                <img src = "img/SAMPLE4.png">
+            </div>
+        </div>
 		<div id="openModal" class="modalDialog">
 			<div>
 				<a href="#close" title="Close" class="close">X</a>
