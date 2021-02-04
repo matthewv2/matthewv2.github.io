@@ -317,6 +317,8 @@ function Generate()
 			lDiagram = i;
 		ch += diagrams[i].height;
 	}
+	
+	console.log(data);
 	resizeCanvas(4 + diagrams[lDiagram].width, ch + 20 * (diagrams.length - 1));
 }
 
