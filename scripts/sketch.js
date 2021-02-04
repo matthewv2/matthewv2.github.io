@@ -10,7 +10,7 @@ function preload()
 
 function setup()
 {
-	console.log("HELLO WORLD");
+	console.log("HELLO WORLD 1 2 3");
 	select('#fontsize').changed(Update_Font_Size);
 	select('#diameter').changed(Update_Diameter);
 	select('#normal').changed(Update_Font_Bold);
