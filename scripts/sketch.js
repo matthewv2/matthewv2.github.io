@@ -19,8 +19,8 @@ function setup()
 	
 	textArea = select('#textArea');
 	textArea.drop(Import_File, Drag_Leave);
-    	textArea.dragOver(Drag_Over);
-    	textArea.dragLeave(Drag_Leave);
+    textArea.dragOver(Drag_Over);
+    textArea.dragLeave(Drag_Leave);
 	
 	CANVAS = createCanvas(1,1).parent('canvasPreview');
 	CANVAS.style('margin:5px');
