@@ -1,23 +1,41 @@
 <!doctype html>
 <html>
 <head>
-	<meta charset="utf-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="cache-control" content="no-cache"/>
-	<meta http-equiv="expires" content="0"/>
-	<meta http-equiv="pragma" content="no-cache"/>
 	<title>kaavio</title>
+	<meta charset="utf-8"/>
 	<link href="kaavio.css" rel="stylesheet" type="text/css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js?v=2"></script>
-	<script src="scripts/jszip.min.js?v=2"> </script>
-	<script src="scripts/filesave.min.js?v=2"> </script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js?2"></script>
+	<script src="scripts/jszip.min.js?2"> </script>
+	<script src="scripts/filesave.min.js?2"> </script>
+	
+	<style>
+		.w3-container, .w3-panel { mrgin: 0; padding: 0.01em 4px;}
+		#regdef {padding-left: 8px; padding-right: 0px;}
+		#accept {height: 40vh;}
+		#acceptDisp, #rejectDisp {width: 100%; height: 32vh; resize: none; background-color: black; color: white;}
+		#reject {height: 40vh;}
+		h1 {color: white; font-weight: bold;}
+	</style>
 </head>
 
 <body>
-<div class = "container">
-	<div class="navbar">
+<div class="navbar" id = "myTopNav">
 		<img src = "img/kaavioLogo.png" id = "kaaviologo"/>
+		<a href = "#" class = "link" id="tdMakerButton" onClick="TD_Maker()"> TD MAKER </a>
+		<a href = "#" class = "link" id="tdTesterButton" onClick="TD_Tester()"> TRANSITION TESTER </a>
+		<label class = "fileHandle" id = "import" for = "importButton"> IMPORT</label>
+		<div class="dropdown">
+		  <button class="dropbtn">EXPORT
+			<i class="fa fa-caret-down"></i>
+		  </button>
+		  <div class="dropdown-content">
+		  <a href="#" onClick="Export_File()">Export text file</a>
+		  <a href="#" onClick="Download()">Export transition diagrams</a>
+		  </div>
+		</div>
 		<a href = "#openModal"><img src = "img/setting_icon.png" id = "setting"/></a>
 		<a href = "#openModalHelp"><img src = "img/help.png" id ="help"></a>
 		<div id="openModalHelp" class="modalDialogHelp">
@@ -58,24 +76,71 @@
 				<button id = "reset">Restore Default</button><br><br>
 			</div>
 		</div>
+		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+			<span id = "bars"><i class="fa fa-bars"></i></span>
+	    </a>
 	</div>
-	<div style="height:64px; width:100%;"></div>	
+	<div id = "backnav" style="height:72px; width:100%; background-color: gray;"></div>	
+
+
+<div class = "container" id="tdMaker">
+	
 	<div class="container-row1">
-		<div class="w3-third w3-container">
+		<div class="w3-third w3-container" style ="padding-left:12px;">
 			<br>
-			<textarea id="textArea" name="subject" placeholder="Insert syntax.."></textarea>
-			<label id = "import" for = "importButton"> IMPORT FILE </label>
-			<button id = "export"> EXPORT FILE </button>
+			<textarea id="dataArea" name="subject" placeholder="Data"></textarea>
 		</div>
-		<div class="w3-twothird w3-container">
+		<div class="w3-twothird w3-container" style ="padding-right:12px;">
 			<br>
 			<div id = "canvasPreview">
-				<script src="scripts/sketch.js?v=2"> </script>
+				<script src="scripts/sketch.js?2"> </script>
 			</div>
-			<button id = "generate"> GENERATE </button>
-			<button id = "download"> DOWNLOAD </button>
 		</div>
+		<button id = "generate"> GENERATE </button>
+	</div>
+</div>
+
+<div class = "container" id="tdTester" style="display:none">
+	<div class="container-row1">
+		<div class="w3-quarter w3-container" id = "regdef">
+			<br>
+			<h1 style = "text-align: center">REGULAR DEFINITION</h1>
+			<div class="w3-third w3-container">
+				<textarea id = "defArea" placeholder="Definition"></textarea>
+			</div>
+			<div class="w3-twothird w3-container">
+				<textarea id = "delimArea" placeholder="Delimiters"></textarea>
+			</div>
+		</div>
+		<div class="w3-threequarter w3-container">
+			<br>
+			<div class="w3-container w3-half">
+				<textarea id = "codeArea" name="subject" placeholder="Code"></textarea>
+			</div>
+			<div class="w3-container w3-half">
+				<div class = "w3-container" id = "accept">
+					<H1 style = "color: lime;">ACCEPT</H1>
+					<textarea id = "acceptDisp" readonly></textarea>
+				</div>
+				<div class = "w3-container" id = "reject">
+					<H1 style = "color: red;">REJECT</H1>
+					<textarea id = "rejectDisp" readonly></textarea>
+				</div>
+			</div>
+		</div>
+		<button id = "test">TEST</button>
 	</div>
 </div>
 </body>
+
+<script>
+function myFunction() {
+  var x = document.getElementById("myTopNav");
+  if (x.className === "navbar") {
+    x.className += " responsive";
+  } else {
+    x.className = "navbar";
+  }
+}
+</script>
 </html>
