@@ -1,5 +1,6 @@
 let fontSize = 25, bold = 0, state = 1, d = 60, dy = d + 10;
-let textHeight, dx, dl, CANVAS, textArea;
+let tdMaker, tdMakerButton, tdTester, tdTesterButton, dataArea, defArea, delimArea, codeArea;
+let textHeight, dx, dl, CANVAS;
 let diagrams = [], Consolas = [];
 
 function preload()
@@ -10,35 +11,37 @@ function preload()
 
 function setup()
 {
-	console.log("HELLO WORLD");
 	select('#fontsize').changed(Update_Font_Size);
 	select('#diameter').changed(Update_Diameter);
 	select('#normal').changed(Update_Font_Bold);
 	select('#bold').changed(Update_Font_Bold);
 	select('#reset').mouseClicked(Reset_Settings);
 	
-	textArea = select('#textArea');
-	textArea.drop(Import_File, Drag_Leave);
-    textArea.dragOver(Drag_Over);
-    textArea.dragLeave(Drag_Leave);
+	tdMaker = select("#tdMaker");
+	tdMakerButton = select("#tdMakerButton");
+	
+	tdTester = select("#tdTester");
+	tdTesterButton = select("#tdTesterButton");
 	
 	CANVAS = createCanvas(1,1).parent('canvasPreview');
 	CANVAS.style('margin:5px');
 	background(0,0);
 	
+	dataArea = select("#dataArea");
+	
 	let importFile = createFileInput(Import_File);
 	importFile.style('display','none');
 	importFile.attribute('accept','.txt');
 	importFile.id('importButton');
-	select('#export').mouseClicked(Export_File);
+	//select('#export').mouseClicked(Export_File);
 	select('#generate').mouseClicked(Generate);
-	select('#download').mouseClicked(Download);
 	
 	textSize(fontSize);
 	Update_Text_Height();
 	noLoop();
 }
 
+ 
 function draw()
 {
 	let y = 2;
@@ -48,6 +51,22 @@ function draw()
 		image(diagrams[i], 2, y);
 		y += 20 + diagrams[i].height;
 	}
+}
+
+function TD_Maker()
+{
+	tdTester.style("display", "none");
+	tdTesterButton.style("color", "white");
+	tdMaker.style("display", "");
+	tdMakerButton.style("color", "yellow");
+}
+
+function TD_Tester()
+{
+	tdMaker.style("display", "none");
+	tdTesterButton.style("color", "yellow");
+	tdTester.style("display", "");
+	tdMakerButton.style("color", "white");
 }
 
 function Update_Diameter()
@@ -88,27 +107,15 @@ function Import_File(file)
 {
   if(file.type != 'text')
     return;
-  document.getElementById('textArea').value = file.data;
-}
-
-function Drag_Over()
-{
-	textArea.style('background-color','#555')
-	textArea.style('color','yellow')
-}
-
-function Drag_Leave()
-{
-	textArea.style('background-color','black')
-	textArea.style('color','white')
+  document.getElementById('dataArea').value = file.data;
 }
 
 function Export_File()
 {
-	if(textArea.value().length == 0)
+	if(dataArea.value().length == 0)
 		return;
 	
-	let blob = new Blob([textArea.value()], {type: "text/plain;charset=utf-8"});
+	let blob = new Blob([dataArea.value()], {type: "text/plain;charset=utf-8"});
 	saveAs(blob, "[KAAVIO] TD Data.txt");
 }
 
@@ -217,12 +224,12 @@ function Generate_Diagram(data, dwidth)
 
 function Generate()
 {	
-	if(textArea.value().length == 0)
+	if(dataArea.value().length == 0)
 		return;
 		
 	diagrams = [];
 	
-	let text = textArea.value();
+	let text = dataArea.value();
 	let lString = "";
 	let data = [[]];
 	let temp = "";
@@ -318,8 +325,6 @@ function Generate()
 			lDiagram = i;
 		ch += diagrams[i].height;
 	}
-	
-	console.log(data);
 	resizeCanvas(4 + diagrams[lDiagram].width, ch + 20 * (diagrams.length - 1));
 }
 
