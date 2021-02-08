@@ -52,11 +52,6 @@ function setup()
     return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
 	});
 }
-
-function WARN()
-{
-	alert("YOU ARE ABOUT TO CLOSE THE TAB!");
-}
  
 function draw()
 {
