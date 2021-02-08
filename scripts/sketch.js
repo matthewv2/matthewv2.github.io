@@ -1,7 +1,7 @@
 let fontSize = 25, bold = 0, state = 1, d = 60, dy = d + 10;
-let tdMaker, tdMakerButton, tdTester, tdTesterButton, dataArea, defArea, delimArea, codeArea;
-let textHeight, dx, dl, CANVAS;
-let diagrams = [], Consolas = [];
+let tdMaker, tdMakerButton, tdTester, tdTesterButton, dataArea, defArea, delimArea, inputArea, outputArea, importFile;
+let textHeight, dx, dl, CANVAS, data;
+let Consolas = [], diagrams = [];
 
 function preload()
 {
@@ -11,6 +11,7 @@ function preload()
 
 function setup()
 {
+	
 	select('#fontsize').changed(Update_Font_Size);
 	select('#diameter').changed(Update_Diameter);
 	select('#normal').changed(Update_Font_Bold);
@@ -27,20 +28,35 @@ function setup()
 	CANVAS.style('margin:5px');
 	background(0,0);
 	
-	dataArea = select("#dataArea");
+	dataArea = select('#dataArea');
+	defArea = select('#defArea');
+	delArea = select('#delArea');
+	inputArea = select('#inputArea');
+	outputArea = select('#outputArea');
 	
-	let importFile = createFileInput(Import_File);
+	importFile = createFileInput(Import_File);
 	importFile.style('display','none');
 	importFile.attribute('accept','.txt');
 	importFile.id('importButton');
-	//select('#export').mouseClicked(Export_File);
-	select('#generate').mouseClicked(Generate);
 	
 	textSize(fontSize);
 	Update_Text_Height();
 	noLoop();
+	
+
+	window.addEventListener("beforeunload", function (e) {
+    e.preventDefault();
+	var confirmationMessage = '';
+
+    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+	});
 }
 
+function WARN()
+{
+	alert("YOU ARE ABOUT TO CLOSE THE TAB!");
+}
  
 function draw()
 {
@@ -106,17 +122,49 @@ function Reset_Settings()
 function Import_File(file)
 {
   if(file.type != 'text')
-    return;
-  document.getElementById('dataArea').value = file.data;
+    alert("The file you uploaded is not a text file!");
+  else
+  {
+	let text = split(file.data, '\n\n<TEST/>\n');
+	document.getElementById('inputArea').value = text[1];
+	
+	
+	text = split(text[0], '\n\n<DELI/>\n');
+	document.getElementById('delArea').value = text[1];
+	
+	text = split(text[0], '\n\n<DEFI/>\n');
+	document.getElementById('defArea').value = text[1];
+	document.getElementById('dataArea').value = text[0];
+  }
+  importFile.value("");
 }
 
-function Export_File()
+function Export_Text()
 {
-	if(dataArea.value().length == 0)
-		return;
-	
-	let blob = new Blob([dataArea.value()], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "[KAAVIO] TD Data.txt");
+	if(dataArea.value().length == 0 && defArea.value().length == 0 && delArea.value().length == 0 && inputArea.value().length == 0)
+		alert("You don't have anything to export!");
+	else
+	{
+		let text = dataArea.value() + "\n\n<DEFI/>\n" + defArea.value() + "\n\n<DELI/>\n" + delArea.value() + "\n\n<TEST/>\n" + inputArea.value();
+		let blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+		saveAs(blob, "[KAAVIO] TD Data.txt");
+	}
+}
+
+function Export_TD()
+{
+	if(diagrams.length == 0)
+		alert("You have not generated any transition diagrams!");
+	else
+	{
+		let zip = new JSZip();
+		for(let i = 0; i < diagrams.length; i++)
+		{
+			let data_URL = diagrams[i].canvas.toDataURL();
+			zip.file('TD ' + str(i+1) +'.png', data_URL.substring(22,data_URL.length), {base64: true});
+		}
+		zip.generateAsync({type:"blob"}).then(function(content) {saveAs(content, "[KAAVIO] Transition Diagrams.zip");});
+	}
 }
 
 function Generate_Diagram(data, dwidth)
@@ -225,119 +273,129 @@ function Generate_Diagram(data, dwidth)
 function Generate()
 {	
 	if(dataArea.value().length == 0)
-		return;
+		alert("You have not inputted any data!");
+	else
+	{
+		diagrams = [];
 		
-	diagrams = [];
-	
-	let text = dataArea.value();
-	let lString = "";
-	let data = [[]];
-	let temp = "";
-	let newArray = true, looped = false, cont = false, del = true;
-	let i = 0, j = -1;
-	let loops = 0;
-	
-	dl = 22 + textHeight;
-	
-	for(let c = 0; c <= text.length; c++)
-	{
-		if(c == text.length || text[c] == ' ' || text[c] == '\t' || text[c] == '\n')
+		let text = dataArea.value();
+		let lString = "";
+		data = [[]];
+		let temp = "";
+		let newArray = true, looped = false, cont = false, del = true;
+		let i = 0, j = -1;
+		let loops = 0;
+		
+		dl = 22 + textHeight;
+		
+		for(let c = 0; c <= text.length; c++)
 		{
-			if(temp != "")
+			if(c == text.length || text[c] == ' ' || text[c] == '\t' || text[c] == '\n')
 			{
-				if(temp == "<NEXT/>" || temp == "<CONT/>")
+				if(temp != "")
 				{
-					append(data[i],[cont, 10 + (data[i].length * d) + (10 * (data[i].length - 1)) + (dl * loops)]);
-					append(data, []);
-					cont = (temp == "<CONT/>");
-					i++;
-					j = -1;
-					loops = 0;
-					lArray = 0;
-				}
-				else
-				{
-					if(match(temp, "<LOOP/>"))
+					if(temp == "<NEXT/>" || temp == "<CONT/>")
 					{
-						let left = split(temp, "<LOOP/>")[0];
-						if(left.length > lString.length)
-							lString = left;
-						looped = true;
+						append(data[i],[cont, 10 + (data[i].length * d) + (10 * (data[i].length - 1)) + (dl * loops)]);
+						append(data, []);
+						cont = (temp == "<CONT/>");
+						i++;
+						j = -1;
+						loops = 0;
+						lArray = 0;
 					}
-					else if(temp.length > lString.length)
-						lString = temp;
-						
-					if(newArray)
+					else
 					{
-						append(data[i],[]);
-						j++;
-						del = true;
-						newArray = false;
-					}
-					append(data[i][j], temp);
-					
-					for(let J = j - 1; del && J >= 0 && data[i][J].length >= data[i][j].length; J--)
-					{
-						if(data[i][j][data[i][j].length-1] == data[i][J][data[i][j].length-1])
+						if(match(temp, "<LOOP/>"))
 						{
-							data[i][j][data[i][j].length-1] = "";
-							break;
+							let left = split(temp, "<LOOP/>")[0];
+							if(left.length > lString.length)
+								lString = left;
+							looped = true;
 						}
-						else if(data[i][J][data[i][j].length-1])
-							del = false;
+						else if(temp.length > lString.length)
+							lString = temp;
+							
+						if(newArray)
+						{
+							append(data[i],[]);
+							j++;
+							del = true;
+							newArray = false;
+						}
+						append(data[i][j], temp);
+						
+						for(let J = j - 1; del && J >= 0 && data[i][J].length >= data[i][j].length; J--)
+						{
+							if(data[i][j][data[i][j].length-1] == data[i][J][data[i][j].length-1])
+							{
+								data[i][j][data[i][j].length-1] = "";
+								break;
+							}
+							else if(data[i][J][data[i][j].length-1])
+								del = false;
+						}
 					}
+					temp = "";
 				}
-				temp = "";
-			}
-			if(text[c] == '\n')
-			{
-				if(looped)
+				if(text[c] == '\n')
 				{
-					loops++;
-					looped = false;
+					if(looped)
+					{
+						loops++;
+						looped = false;
+					}
+					newArray = true;	
 				}
-				newArray = true;	
-			}
-			if(c == text.length)
-			{
-				if(looped)
+				if(c == text.length)
 				{
-					loops++;
-					looped = false;
-				}
-				append(data[i],[cont, 10 + (data[i].length * d) + (10 * (data[i].length - 1)) + (dl * loops)]);
-			}				
-		}			
-		else
-			temp += text[c];
+					if(looped)
+					{
+						loops++;
+						looped = false;
+					}
+					append(data[i],[cont, 10 + (data[i].length * d) + (10 * (data[i].length - 1)) + (dl * loops)]);
+				}				
+			}			
+			else
+				temp += text[c];
+		}
+		dx = 18 + Consolas[bold].textBounds(lString, 0, 0).w;
+		state = 1;
+		let ch = 4, lDiagram = 0;
+		for(let i = 0 ; i < data.length; i++)
+		{
+			let lArray = 0;
+			for(let j = 1; j < data[i].length - 1; j++)
+				if(data[i][j].length > data[i][lArray].length)
+					lArray = j;
+			Generate_Diagram(data[i], 10 + ((data[i][lArray].length + 1) * d) + (dx * data[i][lArray].length));
+			if(diagrams[i].width > diagrams[lDiagram].width)
+				lDiagram = i;
+			ch += diagrams[i].height;
+		}
+		resizeCanvas(4 + diagrams[lDiagram].width, ch + 20 * (diagrams.length - 1));
+		
+		temp = [];
+		for(let i = 0; i < data.length; i++)
+		{
+			let spaces = [];
+			if(data[i][data[i].length-1][0])
+			{
+				for(let j = 0; j < temp[temp.length-1].length-1; j++)
+					append(spaces, "");
+			}
+			for(let j = 0; j < data[i].length - 1; j++)
+				append(temp, spaces.concat(data[i][j]))
+		}
+		data = [];
+		data = temp;
+		
+		//console.log(data);
 	}
-	dx = 18 + Consolas[bold].textBounds(lString, 0, 0).w;
-	state = 1;
-	let ch = 4, lDiagram = 0;
-	for(let i = 0 ; i < data.length; i++)
-	{
-		let lArray = 0;
-		for(let j = 1; j < data[i].length - 1; j++)
-			if(data[i][j].length > data[i][lArray].length)
-				lArray = j;
-		Generate_Diagram(data[i], 10 + ((data[i][lArray].length + 1) * d) + (dx * data[i][lArray].length));
-		if(diagrams[i].width > diagrams[lDiagram].width)
-			lDiagram = i;
-		ch += diagrams[i].height;
-	}
-	resizeCanvas(4 + diagrams[lDiagram].width, ch + 20 * (diagrams.length - 1));
 }
 
-function Download()
+function Test()
 {
-	if(diagrams.length > 0)
-	{
-		let zip = new JSZip();
-		for(let i = 0; i < diagrams.length; i++)
-		{
-			let data_URL = diagrams[i].canvas.toDataURL();
-			zip.file('TD ' + str(i+1) +'.png', data_URL.substring(22,data_URL.length), {base64: true});
-		}
-		zip.generateAsync({type:"blob"}).then(function(content) {saveAs(content, "[KAAVIO] Transition Diagrams.zip");});
-	}
+	
 }
