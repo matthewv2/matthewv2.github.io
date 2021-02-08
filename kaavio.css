@@ -164,7 +164,7 @@ body {
 }
 
 #test{
-	margin-top: 9px;
+	margin-top: 14px;
 }
 
 #generate:hover, #test:hover{
@@ -236,8 +236,9 @@ body {
 	resize: none;
 }
 
-#defArea, #delimArea {
-	overflow:auto;
+#defArea, #delArea {
+	overflow-y:auto;
+	overflow-x:scroll;
 	resize:none;
 	white-space: nowrap;
 	font-family: consolas;
@@ -245,19 +246,6 @@ body {
 	margin: 0;
 	width: 100%;
 	height: 72vh;
-}
-
-#codeArea{
-	overflow: auto;
-	resize:none;
-	white-space: nowrap;
-	width: 100%;
-	height: 80vh;
-	margin: 0x;
-	font-size: 20px;
-	font-family: consolas;
-	background-color: black;
-	color: white;
 }
 
 #import:hover{
