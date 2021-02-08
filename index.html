@@ -7,16 +7,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js?2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.2.0/lib/p5.min.js?2"></script>
 	<script src="scripts/jszip.min.js?2"> </script>
 	<script src="scripts/filesave.min.js?2"> </script>
 	
 	<style>
-		.w3-container, .w3-panel { mrgin: 0; padding: 0.01em 4px;}
 		#regdef {padding-left: 8px; padding-right: 0px;}
-		#accept {height: 40vh;}
-		#acceptDisp, #rejectDisp {width: 100%; height: 32vh; resize: none; background-color: black; color: white;}
-		#reject {height: 40vh;}
+		#accept {height: 15vh;}
+		#inputArea {width: 100%; height: 15vh; resize: none; background-color: black; color: white;}
+		#outputArea {width: 100%; height: 57vh; resize: none; background-color: black; color: white;}
+		#reject {height: 64vh;}
 		h1 {color: white; font-weight: bold;}
 	</style>
 </head>
@@ -32,8 +32,8 @@
 			<i class="fa fa-caret-down"></i>
 		  </button>
 		  <div class="dropdown-content">
-		  <a href="#" onClick="Export_File()">Export text file</a>
-		  <a href="#" onClick="Download()">Export transition diagrams</a>
+		  <a href="#" onClick="Export_Text()">Export text file</a>
+		  <a href="#" onClick="Export_TD()">Export transition diagrams</a>
 		  </div>
 		</div>
 		<a href = "#openModal"><img src = "img/setting_icon.png" id = "setting"/></a>
@@ -96,39 +96,35 @@
 				<script src="scripts/sketch.js?2"> </script>
 			</div>
 		</div>
-		<button id = "generate"> GENERATE </button>
+		<button id = "generate" onClick="Generate()"> GENERATE </button>
 	</div>
 </div>
 
 <div class = "container" id="tdTester" style="display:none">
 	<div class="container-row1">
-		<div class="w3-quarter w3-container" id = "regdef">
+		<div class="w3-half w3-container" id = "regdef">
 			<br>
 			<h1 style = "text-align: center">REGULAR DEFINITION</h1>
 			<div class="w3-third w3-container">
 				<textarea id = "defArea" placeholder="Definition"></textarea>
 			</div>
 			<div class="w3-twothird w3-container">
-				<textarea id = "delimArea" placeholder="Delimiters"></textarea>
+				<textarea id = "delArea" placeholder="Delimiters"></textarea>
 			</div>
 		</div>
-		<div class="w3-threequarter w3-container">
+		<div class="w3-half w3-container" id = "half">
 			<br>
-			<div class="w3-container w3-half">
-				<textarea id = "codeArea" name="subject" placeholder="Code"></textarea>
-			</div>
-			<div class="w3-container w3-half">
-				<div class = "w3-container" id = "accept">
-					<H1 style = "color: lime;">ACCEPT</H1>
-					<textarea id = "acceptDisp" readonly></textarea>
+				<div id = "accept">
+					<textarea id = "inputArea" placeholder = "Insert string here..."></textarea>
 				</div>
-				<div class = "w3-container" id = "reject">
-					<H1 style = "color: red;">REJECT</H1>
-					<textarea id = "rejectDisp" readonly></textarea>
+				<div id = "reject">
+					<H1 style = "color: yellow; text-align: center;">OUTPUT</H1>
+					<textarea id = "outputArea" readonly></textarea>
 				</div>
-			</div>
 		</div>
-		<button id = "test">TEST</button>
+		<div>
+			<button id = "test" onClick="Test()">TEST</button>
+		</div>
 	</div>
 </div>
 </body>
